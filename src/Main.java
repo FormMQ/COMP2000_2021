@@ -1,31 +1,22 @@
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 import java.awt.*;
 
-
-//Used tutors example to work on. Will build upon for next weeks prac.
-
-
-public class Main extends JFrame implements Runnable{
+class Main extends JFrame {
     
-    public class Canvas extends JPanel {
-        public Canvas(){
-            setPreferredSize(new Dimension(720,720));
+    class App extends JPanel {
+        
+        Grid grid;
+
+        public App() {
+            setPreferredSize(new Dimension(720, 720));
+            grid = new Grid();
         }
-        Grid grid = new Grid();    
 
         @Override
         public void paint(Graphics g) {
-            grid.drawGrid(g);
+            grid.paint(g, getMousePosition());
         }
-    }
-        
-    public Main(){
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        Canvas canvas = new Canvas();
-        this.setContentPane(canvas);
-        this.pack();
-        this.setVisible(true);
+
     }
 
     public static void main(String[] args) throws Exception {
@@ -33,9 +24,16 @@ public class Main extends JFrame implements Runnable{
         window.run();
     }
 
-    @Override
+    private Main() {
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        App canvas = new App();
+        this.setContentPane(canvas);
+        this.pack();
+        this.setVisible(true);
+    }
+
     public void run() {
-        while(true) {
+        while (true) {
             this.repaint();
         }
     }
