@@ -2,40 +2,41 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.*;
 
-public class Main extends JFrame {
-    public static void main(String[] args) throws Exception {
-        Main window = new Main();
-        //window.run();
 
-    }
+//Used tutors example to work on. Will build upon for next weeks prac.
 
+
+public class Main extends JFrame implements Runnable{
+    
     public class Canvas extends JPanel {
         public Canvas(){
             setPreferredSize(new Dimension(720,720));
-            
         }
+        Grid grid = new Grid();    
+
         @Override
-        public void paint(Graphics g){
-            g.setColor(Color.BLACK);
-            for (int i = 10; i < 710; i += 35){
-                for (int j = 10; j < 710; j+=35){
-                    g.setColor(Color.WHITE);
-                    g.fillRect(i, j, 35, 35);
-                    g.setColor(Color.BLACK);
-                    g.drawRect(i, j, 35, 35);
-                }
-            }
+        public void paint(Graphics g) {
+            grid.drawGrid(g);
         }
-        
     }
-
-
+        
     public Main(){
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Canvas canvas = new Canvas();
         this.setContentPane(canvas);
         this.pack();
         this.setVisible(true);
+    }
 
+    public static void main(String[] args) throws Exception {
+        Main window = new Main();
+        window.run();
+    }
+
+    @Override
+    public void run() {
+        while(true) {
+            this.repaint();
+        }
     }
 }
