@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-
 class Main extends JFrame {
     
     class App extends JPanel {
@@ -14,7 +13,7 @@ class Main extends JFrame {
 
         @Override
         public void paint(Graphics g) {
-            stage.grid.paint(g, getMousePosition());
+            stage.paint(g, getMousePosition());
         }
 
     }

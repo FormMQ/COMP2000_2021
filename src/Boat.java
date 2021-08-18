@@ -1,7 +1,8 @@
 import java.awt.*;
 
-public class Boat implements Actor {
-    public void paint(Graphics g) {
-        g.setColor(Color.ORANGE);
+public class Boat extends Actor {
+    public Boat(Cell inLoc) {
+        loc = inLoc;
+        color = Color.ORANGE;
     }
 }

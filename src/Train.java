@@ -1,7 +1,8 @@
 import java.awt.*;
 
-public class Train implements Actor {
-    public void paint(Graphics g) {
-        g.setColor(Color.RED);
+public class Train extends Actor {
+    public Train(Cell inLoc) {
+        loc = inLoc;
+        color = Color.RED;
     }
 }

@@ -1,19 +1,15 @@
 import java.awt.*;
-
-
-class Cell extends java.awt.Rectangle {
+class Cell extends Rectangle {
     // fields
     static int size = 35;
 
     //constructors
     public Cell(int x, int y){
         super(x, y, size, size);
-        this.x = x;
-        this.y = y;
     }
 
     //methods
-    public void paint(Graphics g, Point mousePos){
+    void paint(Graphics g, Point mousePos){
         if(contains(mousePos)){
             g.setColor(Color.GRAY);
         } else {
@@ -26,9 +22,10 @@ class Cell extends java.awt.Rectangle {
 
     @Override
     public boolean contains(Point p){
-        if (p == null){
+        if (p != null){
+            return(super.contains(p));
+        } else {
             return false;
         }
-        return (super.contains(p));
     }
 }

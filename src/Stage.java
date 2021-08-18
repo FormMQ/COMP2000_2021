@@ -1,27 +1,23 @@
+import java.awt.Graphics;
 import java.awt.*;
-import java.util.ArrayList;
 
-class Stage {
-    //constructor
+public class Stage {
     Grid grid;
-    Train train;
-    Boat boat;
-    Car car;
-    ArrayList<Actor> actors = new ArrayList<Actor>();
+    Actor train;
+    Actor car;
+    Actor boat;
+
     public Stage() {
         grid = new Grid();
-        car = new Car();
-        boat = new Boat();
-        train = new Train();
-        actors.add(car);
-        actors.add(boat);
-        actors.add(train);
-        for (Actor a:actors){
-            break;
-        } 
+        train = new Train(grid.cellAtColRow(0, 0));
+        car = new Car(grid.cellAtColRow(0, 15));
+        boat = new Boat(grid.cellAtColRow(12, 9));
     }
 
-
-
-    
+    public void paint(Graphics g, Point mouseLoc) {
+        grid.paint(g, mouseLoc);
+        train.paint(g);
+        car.paint(g);
+        boat.paint(g);
+    }
 }
