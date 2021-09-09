@@ -8,13 +8,16 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
+
 class Grid {
-    Cell[][] cells = new Cell[20][20];
+    //Cell[][] cells = new Cell[20][20];
+    int size = 20;
+    IterateCell iteratecell = new IterateCell(); 
 
     public Grid() {
-        for(int i = 0; i < cells.length; i++) {
-            for(int j = 0; j < cells[i].length; j++) {
-                cells[i][j] = new Cell(colToLabel(i), j, 10+35*i, 10+35*j);
+        for(int i = 0; i < size; i++) {
+            for(int j = 0; j < size; j++) {
+                iteratecell.addCell(new Cell(colToLabel(i), j, 10+35*i, 10+35*j));
             }
         }
     }
@@ -32,8 +35,9 @@ class Grid {
     }
 
     private Optional<Cell> cellAtColRow(int c, int r) {
-        if(c >= 0 && c < cells.length && r >= 0 && r < cells[c].length) {
-            return Optional.of(cells[c][r]);
+        List<Cell> cells = iteratecell.getList();
+        if(c >= 0 && c < size && r >= 0 && r < size) {
+            return Optional.of(cells.get(c*size+r));
         } else {
             return Optional.empty();
         }
@@ -42,12 +46,11 @@ class Grid {
     public Optional<Cell> cellAtColRow(char c, int r) {
         return cellAtColRow(labelToCol(c), r);
     }
+    
     public Optional<Cell> cellAtPoint(Point p) {
-        for(int i=0; i < cells.length; i++) {
-            for(int j=0; j < cells[i].length; j++) {
-                if(cells[i][j].contains(p)) {
-                    return Optional.of(cells[i][j]);
-                }
+        for(Cell c: iteratecell) {
+            if(c.contains(p)) {
+                return Optional.of(c);
             }
         }
         return Optional.empty();
@@ -60,12 +63,10 @@ class Grid {
      * @param func The `Cell` to `void` function to apply at each spot.
      */
     public void doToEachCell(Consumer<Cell> func) {
-        for(int i = 0; i < cells.length; i++){
-            for(int j = 0; j < cells[i].length; j++) {
-                func.accept(cells[i][j]);
-            }
+        for(Cell c: iteratecell) {
+            func.accept(c);
         }
-      }
+    }
 
     public void paintOverlay(Graphics g, List<Cell> cells, Color color) {
         g.setColor(color);

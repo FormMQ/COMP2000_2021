@@ -70,4 +70,4 @@ class Main extends JFrame {
             }
         }
     }
-}     
+}
