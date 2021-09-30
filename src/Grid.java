@@ -8,16 +8,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
-
-class Grid {
-    //Cell[][] cells = new Cell[20][20];
-    int size = 20;
-    IterateCell iteratecell = new IterateCell(); 
+class Grid implements Iterable<Cell> {
+    Cell[][] cells = new Cell[20][20];
 
     public Grid() {
-        for(int i = 0; i < size; i++) {
-            for(int j = 0; j < size; j++) {
-                iteratecell.addCell(new Cell(colToLabel(i), j, 10+35*i, 10+35*j));
+        for(int i = 0; i < cells.length; i++) {
+            for(int j = 0; j < cells[i].length; j++) {
+                cells[i][j] = new Cell(colToLabel(i), j, 10+35*i, 10+35*j);
             }
         }
     }
@@ -35,9 +32,8 @@ class Grid {
     }
 
     private Optional<Cell> cellAtColRow(int c, int r) {
-        List<Cell> cells = iteratecell.getList();
-        if(c >= 0 && c < size && r >= 0 && r < size) {
-            return Optional.of(cells.get(c*size+r));
+        if(c >= 0 && c < cells.length && r >= 0 && r < cells[c].length) {
+            return Optional.of(cells[c][r]);
         } else {
             return Optional.empty();
         }
@@ -46,9 +42,8 @@ class Grid {
     public Optional<Cell> cellAtColRow(char c, int r) {
         return cellAtColRow(labelToCol(c), r);
     }
-    
     public Optional<Cell> cellAtPoint(Point p) {
-        for(Cell c: iteratecell) {
+        for(Cell c: this) {
             if(c.contains(p)) {
                 return Optional.of(c);
             }
@@ -63,7 +58,7 @@ class Grid {
      * @param func The `Cell` to `void` function to apply at each spot.
      */
     public void doToEachCell(Consumer<Cell> func) {
-        for(Cell c: iteratecell) {
+        for(Cell c: this) {
             func.accept(c);
         }
     }
@@ -90,5 +85,10 @@ class Grid {
             inRadius.addAll(getRadius(c, size - 1));
         }
         return new ArrayList<Cell>(inRadius);
+    }
+
+    @Override
+    public CellIterator iterator() {
+        return new CellIterator(cells);
     }
 }
