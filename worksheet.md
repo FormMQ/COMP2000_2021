@@ -263,8 +263,259 @@ public class AnimationBeat {
             return rem * 100 / a;
         }
 
+Draw a picture of the inheritance hierarchy you have created.  You should (loosely) use [UML notation](http://www.csci.csusb.edu/dick/cs201/uml.html) for your diagram.  You are using UML In this case, and all through this course, only for "a rough sketch of an idea".
+
+# Task 10
+
+Did you notice the repetition in the stage paint method?  All three actors have the `paint` method called on them.  In fact, we might later want to have dozens of actors on the stage at any one time, we don't want dozens of calls to `someone.paint(g);`.  What we need is a collection to store all the actors, something like an array that we can put them all in.  Then we can just loop over that array and call  `paint` on every element.  _I think_ we should use an `ArrayList` (https://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html).  Notice it is a generic collection?  You will need to use generics to make this work.  Put all the actors in a single array list called `actors` and then loop over this list to paint them.  Once you have done that you might like to add more actors to the stage.
+
+🤔 In my solution, I will declare the actors list as a `List` instead of an `ArrayList`.  Any idea why?  Why does this even work?
+
+# Task 11
+
+Turns out you are not able to use colours to distinguish the different types of actors!  You are going to need to draw little shapes to represent them.  You have been told you can't use images, you have to draw with Java2D primitives so the game can scale up and down as required.  The `Graphics` objects we are painting on know how to draw `Polygon`s (https://docs.oracle.com/javase/8/docs/api/java/awt/Polygon.html) so that is what we are going to use.  However, one polygon is not enough for each actor, we need each to be made of a list of polygons.  We will use `ArrayList` again!  Have the `Color` field of `Actor` changed to a list of polygons and initialise each subclass to an appropriate set of polygons.  You might find the following polygons a useful starting point where `location` is the top-left point of the vehicle (but I am sure you can do better as well - share your designs on the forums!):
+
+## Train
+
+~~~~~
+int sides=20;
+int angle;
+double circleX;
+double circleY;
+Polygon rearWheel = new Polygon();
+Polygon midWheel = new Polygon();
+Polygon frontWheel = new Polygon();
+angle = 360/sides;
+for(int s=0; s<=sides; s++) {
+  circleX = (3.0*Math.sin(Math.toRadians(s*angle)));
+  circleY = (3.0*Math.cos(Math.toRadians(s*angle)));
+  rearWheel.addPoint(loc.x + 9 + (int) circleX, loc.y + 25 + (int) circleY);
+  midWheel.addPoint(loc.x + 17 + (int) circleX, loc.y + 25 + (int) circleY);
+  frontWheel.addPoint(loc.x + 23 + (int) circleX, loc.y + 25 + (int) circleY);
+}
+Polygon cab = new Polygon();
+cab.addPoint(loc.x + 6, loc.y + 7);
+cab.addPoint(loc.x + 11, loc.y + 7);
+cab.addPoint(loc.x + 11, loc.y + 20);
+cab.addPoint(loc.x + 6, loc.y + 20);
+Polygon body = new Polygon();
+body.addPoint(loc.x + 11, loc.y + 14);
+body.addPoint(loc.x + 24, loc.y + 14);
+body.addPoint(loc.x + 29, loc.y + 20);
+body.addPoint(loc.x + 11, loc.y + 20);
+~~~~~
+
+## Car
+
+~~~~~
+int sides=20;
+int angle;
+double circleX;
+double circleY;
+Polygon rearWheel = new Polygon();
+Polygon frontWheel = new Polygon();
+angle = 360/sides;
+for(int s=0; s<=sides; s++) {
+  circleX = (4.0*Math.sin(Math.toRadians(s*angle)));
+  circleY = (4.0*Math.cos(Math.toRadians(s*angle)));
+  rearWheel.addPoint(loc.x + 11 + (int) circleX, loc.y + 25 + (int) circleY);
+  frontWheel.addPoint(loc.x + 24 + (int) circleX, loc.y + 25 + (int) circleY);
+}
+Polygon body = new Polygon();
+body.addPoint(loc.x + 6, loc.y + 14);
+body.addPoint(loc.x + 29, loc.y + 14);
+body.addPoint(loc.x + 29, loc.y + 20);
+body.addPoint(loc.x + 6, loc.y + 20);
+Polygon top = new Polygon();
+top.addPoint(loc.x + 11, loc.y + 7);
+top.addPoint(loc.x + 20, loc.y + 7);
+top.addPoint(loc.x + 24, loc.y + 14);
+top.addPoint(loc.x + 11, loc.y + 14);
+~~~~~
+
+## Boat
+
+~~~~~
+Polygon leftSail = new Polygon();
+leftSail.addPoint(loc.x + 16, loc.y + 11);
+leftSail.addPoint(loc.x + 11, loc.y + 24);
+leftSail.addPoint(loc.x + 16, loc.y + 24);
+Polygon rightSail = new Polygon();
+rightSail.addPoint(loc.x + 18, loc.y + 7);
+rightSail.addPoint(loc.x + 24, loc.y + 24);
+rightSail.addPoint(loc.x + 18, loc.y + 24);
+Polygon body = new Polygon();
+body.addPoint(loc.x + 6, loc.y + 24);
+body.addPoint(loc.x + 29, loc.y + 24);
+body.addPoint(loc.x + 24, loc.y + 29);
+body.addPoint(loc.x + 11, loc.y + 29);
+~~~~~
+
+# Task 12
+
+In this task we will add a method to the grid class that returns whatever cell is under a particular location.
+
+Such a method needs to take in a `Point` and return back a `Cell`.  It will do a simple calculation to turn the x and y coordinates into the right array indices and look them up.
+
+However, there are some areas on our stage where there are no cells, not to mention what to do when a `null` point is passed in!
+
+So, we need a method that _might_ return a `Cell`.  What should it do when it can't find a cell?  Return `null`?  Definitely not!!!!  You are just asking for a asking for null-pointer exception if you do that.  Instead, we will use the `Optional` generic container (https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html).  
+
+Add the following method to `Grid` that will return whatever cell is located around the point that is passed in.
+
+~~~~~
+public Optional<Cell> cellAtPoint(Point p)
+~~~~~
+
+🤔 How about we improve the `cellAtColRow` method now we know about optional containers?
+
+🤔 Now that we have `cellAtPoint`, lets use it.  Grow the app window to 1024x720 so we have some clear space to the right of the grid.  In this space, put the details of whatever cell we are hoving over.  For example, you might put the type of cell that is located there, and what it's elevation is.  There are many ways to do this, but one good way is to call `cellAtPoint` while painting the stage and use the resulting cell information.
+# Task 13
+
+Our task now is to add the ability to read in configuration data from a file.  Someone else at the company (person A) has tried and has committed some broken code.
+
+A file is kept in a "data" folder called "stage1.rvb". That file has one line for each configuration item.  We begin with just the character locations.
+
+This all seems OK, but they are getting an error on the build.  Track down the error and fix it for them.
+
+# Task 14
+
+At the moment, the file reading code will thrown an exception if it fails to read a file.  You should change this code so that _it won't ever throw an exception_.  This means you will have to think hard about what to do on a failed file read.
+
+# Task 15
+
+Currently, the game loop (in `Main.run`) is running as fast as it can.   This just burns CPU cycles and heats up your computer needlessly.  Your task is to "fix" the frame-rate so we are not pointlessly burning CPU power. You can do this by asking the current thread to sleep for a period of time using `Thread.sleep`. We want the frame-rate to be about 50 frames per second, that means we need the loop to take 20ms to complete.
+
+Sleeping a thread throws an `InterruptedException` so you will need to catch that. In fact, we don't care about the thread being interrupted so the catch block should just report the fact it was interrupted, print out a representation (via `toString`) of the exception that was thrown, and continue on as normal.
+
+🤔 Can you even cause the exception to be thrown?
+
+# Task 16
+
+Add the following method to the `Grid` class
+
+~~~~~
+    /**
+     * Takes a cell consumer (i.e. a function that has a single `Cell` argument and
+     * returns `void`) and applies that consumer to each cell in the grid.
+     * @param func The `Cell` to `void` function to apply at each spot.
+     */
+    public void doToEachCell(Consumer<Cell> func) {
+      // Your job to add the body
+    }
+~~~~~
+
+ Notice that the method accepts a `Consumer` functional interface.
+
+ Now use this method to turn the `paint` method of the `Grid` class into a single line of code.  I.e. remove the double-nested loop and replace it with a call to `doToEachCell`.
+
+🤔 Can you find anywhere else this is useful?  🤔🤔 Can you make any other useful _higher order_ methods?
+
+# Task 17
+
+The team has signed off on the game concept and it is time to start developing the gameplay.  The big-wigs at your company have decided the world needs a new turn-based strategy game in the spirit of famicom-wars, so we will build one of those.  The first step is to put in the turns!  We are going to need:
+  * Characters on different teams
+  * A way for the player to move their characters
+  * A way for the computer to move the other characters.
+
+To help us make these changes, take a look at a UML diagram of the system as we have it now (doc/task16.png) and compare it to a UML diagram of where we need to be (with changes in red) (doc/task17.png)
+
+We have made all the changes for you, but please go through each one to understand what we have done.  I.e. your job for this task is to understand the code we have added rather than adding any code of your own.  I strongly encourage you to explore this commit on github or in VSCode using the GitLens addon where you can see exactly what lines were added/deleted/modified in making these changes.
+
+If you play the game now, you will see there are three stages:
+  * player chooses character
+  * player chooses new location
+  * computer moves its characters
+
+Notice that the computer move is random every time.  The AI (such as it is) asks for all cells that actor can move to, and picks one at random to move to.
+
+# Task 18
+
+We are going to build some (very rudimentary) strategy into this turn-based strategy game.  At the moment, all the actors on team blue will just move randomly.  Instead, we want their strategy to be determined by _which row they are on_.  If they are on an even-numbered then they should move randomly, but if they are on an odd-numbered row they should _always move to the left-most possible location_.  Note:  if it is not clear yet, you need the strategy pattern so implement this.  Why is is the right pattern for this task?
+
+🤔 Task 18a
+
+This task sits to the side of our other tasks. It is an experiment. Even after we get an answer, we won't build upon that answer in later tasks, i.e. we will use the Task 18 answer as the basis for Task 19. However, I think this is the most interesting task so far, it is certainly worth your time.
+
+Can we make the strategy pattern we just created disappear with lambda expressions? More concretely, can I get rid of the strategy interface and its subclasses and still have dynamic behaviour at run-time? If so, implement it and discuss the pros and cons of this approach compared to a "real" strategy pattern.
+# Task 19
+
+Head office have demanded that all iteration be done with the ["enhanced for loop" - aka the "for each" loop](https://blogs.oracle.com/corejavatechtips/using-enhanced-for-loops-with-your-classes).  You don't mind, this is a sensible-enough plan.
+
+You go on a hunt for loops that might need changing.  First you find the nested for-loops in the `Grid` constructor but head-office allow old-style loops for building arrays.  However, there are _two_ other places in `Grid.java` where forbidden-looping techqniques are used.  The team has a discussion and decides the best solution is to add an iterator to `Grid` so that the enhanced for loop can be used.
+
+Your job is to create such an iterator.  It must iterate over every cell in the grid, but the order it does so does not matter.  Then you should use that iterator to replace all the forbidden loops in `Grid`.
+
+# 🤔 Task 20
+
+Your boss has suggested the following new gameplay:  When one character moves on top of another, they become "stuck" to each other.  Their `redness` is the average of each `redness` and their `moves` is the minimum of each `moves`.  That "double-character" could then move onto another character to make a "triple-character", etc.  Your boss also thinks that the composite pattern is the way to implement this.
+
+The composite pattern can be quite variable, and it is easy to stray from it in situations where you think it might be useful.  Come up with a design for the above suggestion that _is as close as possible to the composite pattern_.  Explain where it differs and whether you think that matters.  Is your solution a valid composite?
+# Task 21
+
+Do you know how the enemies in [mario bros. move along with the music?](https://www.youtube.com/watch?v=nQy-eJALZI0_).  Your team wants something like that for your game.  They want all actors in the game to animate along with a "beat".  All actors should be syncronised and it should be possible to adjust the beat during development so it can sync-up with whatever music gets used.
+
+You have done some thinking and decided that a good solution is to have an `AnimationBeat` class that always knows where you are up to in the beat.  Other objects can query this object to find out where they are up to in the beat and adjust their animation accordingly.
+
+Just like in Mario Bros. the music goes in repeating phases, say one long one, then two short ones.  A colleague has created a basic class that might achieve this
+
+~~~~~
+public class AnimationBeat {
+    private long started;
+    private long a; // length of phase a
+    private long b; // length of phase b
+    private long c; // length of phase c
+   
+    public AnimationBeat(){
+        started = System.currentTimeMillis();
+        this.a = 5000;
+        this.b = 500;
+        this.c = 500;
+    }
+
+    // returns which phase the animation is currently in
+    public char inPhase() {
+        long currTime = System.currentTimeMillis();
+        long rem = (currTime - started) % (a + b + c);
+        if (rem > a + b) {
+            return 'c';
+        } else if (rem > a) {
+            return 'b';
+        } else {
+            return 'a';
+        }
+    }
+
+    // returns a number (out of 100) showing the percentage completion of this phase
+    public long phaseCompletion() { 
+        long currTime = System.currentTimeMillis();
+        long rem = (currTime - started) % (a + b + c);
+        if (rem > a + b) {
+            return ((rem -a - b) * 100) / c;
+        } else if (rem > a) {
+            return ((rem - a) * 100) / b;
+        } else {
+            return rem * 100 / a;
+        }
+
     }
 }
-Notice that is implmenents a beat with three phases (a, b, and c) and that phase a goes for 5 seconds while phases b and c go for half-a second each.
+~~~~~
 
-Your task is to incorporate this code into the project using the most appropriate design pattern to do so. You will need to make some changes to your colleague's code to ensure you match the pattern. Then incorporate the animation beat somewhere in the application to demonstrate that it is working.
+Notice that is implmenents a beat with three phases (`a`, `b`, and `c`) and that phase `a` goes for 5 seconds while phases `b` and `c` go for half-a second each.
+
+Your task is to incorporate this code into the project _using the most appropriate design pattern_ to do so.  You will need to make some changes to your colleague's code to ensure you match the pattern.  Then incorporate the animation beat somewhere in the application to demonstrate that it is working.
+
+# Task 22
+A collegue has provided you with a library as a [jar file](https://docs.oracle.com/javase/tutorial/deployment/jar/index.html). Jar files are a way of distributing a collection of already compiled java code. You can use the classes embedded in a jar file just as you would any class for which you have the source available.
+
+Your collegue's library contains only one class, called `Motif`.  This class allows you to load an image from a file and then draw it anywhere on the screen in the color of your choice (similar to a grayscale image, but any color can be chosen, not just gray).  An example of its use has been added to `Stage` (look for the instance variable called `torch`).
+
+We would like to use this class to add new player types to the game, however `Motif` is not a subclass of `Actor`.  Use the adapter pattern to add a new `Actor` type called `Horse`.  Note that because `Actor` is an abstract base class and not a Java interface it will be easier if you vary the pattern slightly from what is shown in the textbook.  The image file you use should be one of the chess icons included in the `images/data` subdirectory, specifically `Chess_tile_nl.png`.
+
+`Motif` has the following two public methods:
+
+  * `public Motif(String filename)`
+  * `public void draw(Graphics g, int x, int y, Color c)`
+
+Where the first is the constructor, `filename` is the path to the image file. For the second method, `x` and `y` are the location on the screen and `c` is the color you wish to render the image in.
